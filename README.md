@@ -1,15 +1,18 @@
-# Smart-Surveillance-System
-Donwload models: https://drive.google.com/drive/folders/1-OgwWPJ4Rrz_ahTJiOg9skxvh1Yxl2qC?usp=drive_link
+# Smart Surveillance Capstone Project
 
-## 📁 Project Directory Structure
+This project demonstrates a multi-model AI pipeline for real-time attribute recognition in surveillance scenarios. It includes:
 
-> Excludes image files (.jpg, .png, etc.), `.mat`, and `.db` files for clarity.
+- **Fashionpedia model**: Detects clothing categories and attributes.
+- **UPAR model**: Recognizes person-level visual attributes (e.g. backpack, long hair).
+- **FairFace model**: Predicts age, gender, and race from faces.
+- **CelebA model**: Recognizes facial appearance attributes (e.g. smiling, eyeglasses).
+- **Unified Inference Script**: Combines all models in a single interface with switches to enable/disable specific models.
 
-<details>
-<summary>Click to expand</summary>
+---
 
-```
-.
+## Directory Tree (excluding image files)
+
+```text
 ├── Fashionpedia
 │   ├── Fashionpedia_old.ipynb
 │   ├── data
@@ -37,34 +40,12 @@ Donwload models: https://drive.google.com/drive/folders/1-OgwWPJ4Rrz_ahTJiOg9skx
 │   │   │       └── release_data
 │   │   ├── PETA
 │   │   │   ├── PETA dataset
-│   │   │   │   ├── 3DPeS
-│   │   │   │   │   └── archive
-│   │   │   │   ├── CAVIAR4REID
-│   │   │   │   │   └── archive
-│   │   │   │   ├── CUHK
-│   │   │   │   │   └── archive
-│   │   │   │   ├── GRID
-│   │   │   │   │   └── archive
-│   │   │   │   ├── MIT
-│   │   │   │   │   └── archive
-│   │   │   │   ├── PRID
-│   │   │   │   │   └── archive
-│   │   │   │   ├── SARC3D
-│   │   │   │   │   └── archive
-│   │   │   │   ├── TownCentre
-│   │   │   │   │   └── archive
-│   │   │   │   ├── VIPeR
-│   │   │   │   │   └── archive
-│   │   │   │   └── i-LID
-│   │   │   │       └── archive
+│   │   │   │   ├── ...
 │   │   ├── PETA_ALL_UPAR_labels.csv
 │   │   ├── RAP2
-│   │   │   └── RAP_dataset
-│   │   │       └── .gitsave
 │   │   ├── dataset_all.pkl
 │   │   └── dataset_all_merged.pkl
 │   └── peta_fix.ipynb
-├── Untitled.ipynb
 ├── celeba
 │   ├── celeba.ipynb
 │   ├── celeba_old.ipynb
@@ -73,13 +54,7 @@ Donwload models: https://drive.google.com/drive/folders/1-OgwWPJ4Rrz_ahTJiOg9skx
 │       ├── celeba_test.csv
 │       ├── celeba_train.csv
 │       ├── celeba_val.csv
-│       ├── identity_CelebA.txt
-│       ├── img_align_celeba
-│       ├── list_attr_celeba.txt
-│       ├── list_bbox_celeba.txt
-│       ├── list_eval_partition.txt
-│       ├── list_landmarks_align_celeba.txt
-│       └── list_landmarks_celeba.txt
+│       └── ...
 ├── fairface
 │   ├── FairFace.ipynb
 │   ├── data
@@ -88,17 +63,37 @@ Donwload models: https://drive.google.com/drive/folders/1-OgwWPJ4Rrz_ahTJiOg9skx
 │   │   ├── train
 │   │   └── val
 │   └── fairface_old.ipynb
-└── z_ignore
-    ├── Untitled.ipynb
-    ├── aligned
-    │   ├── train
-    │   └── val
-    ├── aligned_train.csv
-    ├── aligned_val.csv
-    ├── best_model.pt
-    └── data
-        ├── MAAD_Face.csv
-        ├── MAAD_Face_1.0.pkl
-        ├── MAAD_label_stats.csv
-        ├── train
-        └── val
+├── z_ignore
+│   └── ...
+├── capstone_project.ipynb
+```
+
+---
+
+## How to Use
+
+You can run the unified inference pipeline using the notebook:
+
+```
+capstone_project.ipynb
+```
+
+Supported input methods:
+- Upload a **photo** (e.g. street image, group photo).
+- Use your **webcam** for real-time detection and analysis.
+
+Each model can be enabled or disabled with flags in the script:
+```python
+ENABLE_FAIRFACE = True
+ENABLE_CELEBA = True
+ENABLE_UPAR = True
+ENABLE_FASHIONPEDIA = True
+```
+
+---
+
+## Download Trained Models
+
+**Models for this project can be downloaded here:**
+
+👉 [Download models](https://drive.google.com/drive/folders/1-OgwWPJ4Rrz_ahTJiOg9skxvh1Yxl2qC?usp=drive_link)
