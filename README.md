@@ -1,7 +1,15 @@
 # Smart-Surveillance-System
 Donwload models: https://drive.google.com/drive/folders/1-OgwWPJ4Rrz_ahTJiOg9skxvh1Yxl2qC?usp=drive_link
 
-Directory tree (excluding image files):
+## 📁 Project Directory Structure
+
+> Excludes image files (.jpg, .png, etc.), `.mat`, and `.db` files for clarity.
+
+<details>
+<summary>Click to expand</summary>
+
+```
+.
 ├── Fashionpedia
 │   ├── Fashionpedia_old.ipynb
 │   ├── data
@@ -31,36 +39,24 @@ Directory tree (excluding image files):
 │   │   │   ├── PETA dataset
 │   │   │   │   ├── 3DPeS
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── CAVIAR4REID
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── CUHK
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── GRID
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── MIT
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── PRID
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── SARC3D
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── TownCentre
 │   │   │   │   │   └── archive
-│   │   │   │   │       └── Label.txt
 │   │   │   │   ├── VIPeR
 │   │   │   │   │   └── archive
-│   │   │   │   │       ├── Label.txt
-│   │   │   │   │       └── delme.txt
 │   │   │   │   └── i-LID
 │   │   │   │       └── archive
-│   │   │   │           └── Label.txt
-│   │   │   └── ReadMe.txt
 │   │   ├── PETA_ALL_UPAR_labels.csv
 │   │   ├── RAP2
 │   │   │   └── RAP_dataset
@@ -105,36 +101,4 @@ Directory tree (excluding image files):
         ├── MAAD_Face_1.0.pkl
         ├── MAAD_label_stats.csv
         ├── train
-        │   ├── n000002
-        │   ├── n000003
-        │   ├── n000004
-        │   ├── n000005
-        │   ├── n000006
-        │   ├── n000007
-        │   ├── n000008
-        │   ├── n000010
-        │   ├── n000011
-        │   ├── n000012
-        │   ├── n000013
-        │   ├── n000014
-        │   ├── n000015
-        │   ├── n000016
-        │   └── n000017
-        │   │   ...
         └── val
-            ├── n000001
-            ├── n000009
-            ├── n000029
-            ├── n000040
-            ├── n000078
-            ├── n000082
-            ├── n000106
-            ├── n000129
-            ├── n000148
-            ├── n000149
-            ├── n000178
-            ├── n000259
-            ├── n000284
-            ├── n000363
-            └── n000394
-            │   ...
