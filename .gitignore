@@ -1,0 +1,8 @@
+# ignore Python artifacts
+__pycache__/
+*.py[cod]
+*.so
+
+# editor
+.vscode/
+.DS_Store
