@@ -3,45 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Smart Surveillance System</title>
-  <!-- If you want to change the page title, edit it above -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <header>
-    <h1>
-      <!-- EDIT THIS to change the top‐of‐page title -->
-      Smart Surveillance System
-    </h1>
+    <div class="header-inner">
+      <div class="title-block">
+        <h1 class=>Smart Surveillance System</h1>
+      </div>
+    </div>
   </header>
 
   <div class="container">
-    <!-- UPLOAD PANEL -->
-    <div class="panel" id="uploadPanel">
-      <div class="panel-title">Upload</div>
+    <!-- INPUT PANEL -->
+    <div class="panel" id="inputPanel">
+      <div class="panel-title">Input Surveillance</div>
       <div class="panel-content" id="uploadContent">
-        <!-- Selected image/video or webcam stream will appear here -->
       </div>
       <div class="panel-buttons">
-        <button id="fileButton">Image/Video</button>
-        <button id="webcamButton">Webcam</button>
-        <!-- hidden file input -->
-        <input type="file" id="fileInput" accept="image/*,video/*" hidden>
+        <div class="group">
+          <button id="fileButton" class="primary">Image / Video</button>
+          <input type="file" id="fileInput" accept="image/*,video/*" hidden>
+          <button id="webcamCaptureButton" class="secondary">Webcam / Capture</button>
+        </div>
       </div>
     </div>
 
     <!-- OUTPUT PANEL -->
     <div class="panel" id="outputPanel">
-      <div class="panel-title">Output</div>
+      <div class="panel-title">Output Insights</div>
       <div class="panel-content" id="outputContent">
-        <!-- AI model results will go here -->
+        <!-- Prediction / model output will go here eventually -->
       </div>
       <div class="panel-buttons">
-        <button id="exportButton">Export</button>
-        <button id="clearButton">Clear</button>
+        <div class="group">
+          <button id="predictButton" class="accent">Predict</button>
+          <button id="clearButton" class="tertiary">Clear</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

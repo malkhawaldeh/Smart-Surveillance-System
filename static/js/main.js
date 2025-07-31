@@ -1,13 +1,26 @@
-// 1) File‐select button → opens file dialog
+console.log('✅ main.js loaded (updated UI behavior)');
+
+let currentStream = null;
+
+function stopWebcam() {
+  if (currentStream) {
+    currentStream.getTracks().forEach(t => t.stop());
+    currentStream = null;
+  }
+  const uploadContent = document.getElementById('uploadContent');
+  const video = uploadContent.querySelector('video');
+  if (video) video.remove();
+}
+
 document.getElementById('fileButton').addEventListener('click', () => {
   document.getElementById('fileInput').click();
 });
-
-// when a file is chosen, display it:
 document.getElementById('fileInput').addEventListener('change', event => {
+  stopWebcam();
   const file = event.target.files[0];
   const uploadContent = document.getElementById('uploadContent');
-  uploadContent.innerHTML = '';  // clear previous
+  uploadContent.innerHTML = '';
+  if (!file) return;
 
   const url = URL.createObjectURL(file);
   if (file.type.startsWith('image/')) {
@@ -19,33 +32,70 @@ document.getElementById('fileInput').addEventListener('change', event => {
     const video = document.createElement('video');
     video.src = url;
     video.controls = true;
+    video.autoplay = false;
     uploadContent.appendChild(video);
+  } else {
+    uploadContent.textContent = 'Unsupported file type.';
   }
-  // TODO: HERE you could call your AI model API with `file`
+  const wc = document.getElementById('webcamCaptureButton');
+  wc.textContent = 'Webcam / Capture';
 });
 
-// 2) Webcam button → starts live camera
-document.getElementById('webcamButton').addEventListener('click', () => {
+const webcamBtn = document.getElementById('webcamCaptureButton');
+webcamBtn.addEventListener('click', () => {
   const uploadContent = document.getElementById('uploadContent');
-  uploadContent.innerHTML = '';
-  const video = document.createElement('video');
-  video.autoplay = true;
-  uploadContent.appendChild(video);
 
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => { video.srcObject = stream; })
-    .catch(err => console.error('Webcam error:', err));
-  
-  // TODO: HERE you could capture frames & send to your AI model
+  if (!currentStream) {
+    // start webcam
+    uploadContent.innerHTML = '';
+    const video = document.createElement('video');
+    video.autoplay = true;
+    video.setAttribute('playsinline', '');
+    video.style.maxHeight = '100%';
+    uploadContent.appendChild(video);
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        currentStream = stream;
+        video.srcObject = stream;
+        webcamBtn.textContent = 'Capture';
+      })
+      .catch(err => {
+        console.error('Webcam error:', err);
+        uploadContent.innerHTML = `<p style="color:salmon;">⚠️ Camera error: ${err.name}</p>`;
+      });
+  } else {
+    const video = uploadContent.querySelector('video');
+    if (!video) {
+      stopWebcam();
+      webcamBtn.textContent = 'Webcam / Capture';
+      return;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png');
+    img.alt = 'Captured still';
+    img.style.maxWidth = '100%';
+    img.style.borderRadius = '6px';
+
+    stopWebcam();
+    uploadContent.innerHTML = '';
+    uploadContent.appendChild(img);
+    webcamBtn.textContent = 'Webcam / Capture';
+  }
 });
 
-// 3) Export button (stub)
-document.getElementById('exportButton').addEventListener('click', () => {
-  // TODO: Add export functionality here (e.g. download CSV/JSON of output)
-  console.log('Export button clicked — wire up your export logic here.');
+// Predict stub
+document.getElementById('predictButton').addEventListener('click', () => {
+  const out = document.getElementById('outputContent');
+  out.innerHTML = '<p style="opacity:.85;">[Predict clicked — model logic placeholder]</p>';
 });
 
-// 4) Clear button → clears output panel
 document.getElementById('clearButton').addEventListener('click', () => {
   document.getElementById('outputContent').innerHTML = '';
 });

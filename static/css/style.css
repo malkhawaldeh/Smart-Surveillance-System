@@ -1,87 +1,198 @@
-/* Atom One Dark–inspired palette */
 :root {
-  --bg:   #282c34;
-  --panel:#21252b;
-  --border:#3e4451;
-  --fg:   #abb2bf;
-  --btn:  #61afef;
-  --btn-hover: #528bff;
+  --bg: #1f242c;
+  --panel: #232934;
+  --border: #2f3542;
+  --fg: #d1d9e6;
+  --radius: 10px;
+  --shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+  --transition: 0.25s cubic-bezier(.4,.2,.2,1);
+  --gap: 1.5rem;
+  --btn-primary: #5f7fa8;
+  --btn-primary-hover: #6f8fbf;
+  --btn-secondary: #555d8f;
+  --btn-accent: #4fd1c5;
+  --btn-tertiary: #2f3a50;
+  --focus: rgba(92,158,255,0.4);
+  font-synthesis: none;
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: sans-serif;
+  font-family: "Inter", system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  margin: 0;
   min-height: 100vh;
+  line-height: 1.4;
 }
 header {
-  text-align: center;
-  padding: 1rem;
+  background: linear-gradient(135deg, #1f242c 0%, #2a3040 70%);
   border-bottom: 1px solid var(--border);
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-inner {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 h1 {
-  font-size: 1.5rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+.tagline {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #a3afc2;
 }
 
 .container {
   display: flex;
-  justify-content: space-around;
-  padding: 2rem;
-  gap: 1rem;
+  gap: 5rem;
+  padding: 1rem 1rem 2rem;
+  margin-top: 3.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  width: 45%;
+  border-radius: var(--radius);
+  flex: 1 1 480px;
   display: flex;
   flex-direction: column;
-  height: 60vh;
+  min-width: 360px;
+  max-width: 720px;
+  height: 68vh;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
 }
 
 .panel-title {
-  padding: 0.5rem;
-  font-weight: bold;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  text-align: center;
 }
 
 .panel-content {
   flex: 1;
-  padding: 0.5rem;
-  overflow: auto;
+  padding: 1rem;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: auto;
   align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .panel-content img,
 .panel-content video {
   max-width: 100%;
-  max-height: 100%;
-  border-radius: 4px;
+  border-radius: 8px;
+  background: #1f242c;
+  box-shadow: 0 14px 50px -15px rgba(0,0,0,0.6);
+  object-fit: contain;
+  display: block;
 }
 
 .panel-buttons {
-  padding: 0.5rem;
-  border-top: 1px solid var(--border);
+  padding: 1rem;
   display: flex;
-  justify-content: space-evenly;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: stretch;
+  border-top: 1px solid var(--border);
+}
+
+.group {
+  display: flex;
+  gap: 0.75rem;
+  flex: 1;
 }
 
 button {
-  background: var(--btn);
-  color: var(--bg);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
   cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: all var(--transition);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  box-shadow: 0 14px 38px -6px rgba(0,0,0,0.45);
 }
-button:hover {
-  background: var(--btn-hover);
+
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button.primary {
+  background: var(--btn-primary);
+  color: #fff;
+}
+button.primary:hover {
+  background: var(--btn-primary-hover);
+  transform: translateY(-1px);
+}
+button.secondary {
+  background: var(--btn-secondary);
+  color: #fff;
+}
+button.secondary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+button.accent {
+  background: var(--btn-accent);
+  color: #1f242c;
+}
+button.accent:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+button.tertiary {
+  background: var(--btn-tertiary);
+  color: var(--fg);
+}
+button.tertiary:hover {
+  background: #2a3248;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1100px) {
+  .panel {
+    width: 100%;
+    max-width: none;
+    height: auto;
+  }
 }
