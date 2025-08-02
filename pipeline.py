@@ -13,11 +13,6 @@ import torch.nn.functional as F
 # === for simplify_result ===
 FAIRFACE_GENDER_LABELS = ['Female', 'Male']
 FAIRFACE_RACE_LABELS = ['Black', 'East Asian', 'Indian', 'Latino_Hispanic', 'Middle Eastern', 'Southeast Asian', 'White']
-UPAR_LABEL_COLS = [
-    'Accessory-Backpack', 'Accessory-Bag', 'Accessory-Glasses-Normal', 'Accessory-Hat',
-    'Age-Adult', 'Age-Young', 'Gender-Female', 'Hair-Length-Long', 'Hair-Length-Short'
-]
-
 # ================= CONFIGURATION & PATHS =================
 
 # --- Attribute model weights ---
@@ -85,7 +80,7 @@ UPAR_THRESHOLDS_DEFAULT = {
     'Hair-Length-Long': 0.85, 'Hair-Length-Short': 0.85
 }
 
-FASHIONPEDIA_ATTRIBUTES_FALLBACK = {}  # id -> name
+FASHIONPEDIA_ATTRIBUTES_FALLBACK = {} 
 
 # ================== TRANSFORMS =====================
 celeba_transform = transforms.Compose([
