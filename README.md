@@ -97,3 +97,7 @@ ENABLE_FASHIONPEDIA = True
 **Models for this project can be downloaded here:**
 
 👉 [Download models](https://drive.google.com/drive/folders/1-OgwWPJ4Rrz_ahTJiOg9skxvh1Yxl2qC?usp=drive_link)
+
+## Dashboard Demo
+<img width="2558" height="2300" alt="image" src="https://github.com/user-attachments/assets/a70bf744-b159-4c6a-9d70-d7995cec7c50" />
+
