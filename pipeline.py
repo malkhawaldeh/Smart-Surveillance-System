@@ -57,13 +57,7 @@ CELEBA_ATTRIBUTES_CLEANED = [
     "Wavy_Hair", "Wearing_Earrings", "Wearing_Lipstick", "Wearing_Necklace", "Wearing_Necktie", "Young"
 ]
 CELEBA_THRESHOLDS_DEFAULT = {
-    "Male": 0.95,
-    "Smiling": 0.50,
-    "Wearing_Earrings": 0.50,
-    "Heavy_Makeup": 0.75,
-    "No_Beard": 0.95,
-    "Eyeglasses": 0.70,
-    "Young": 0.70,
+    attr: 0.5 for attr in CELEBA_ATTRIBUTES_CLEANED 
 }
 
 FAIRFACE_RACE_LABELS = ['Black', 'East Asian', 'Indian', 'Latino_Hispanic', 'Middle Eastern', 'Southeast Asian', 'White']
@@ -362,25 +356,43 @@ def detect_people(net, image, conf_threshold=0.5):
 
 
 # ================== PREDICTION FUNCTIONS =====================
-def predict_celeba(model, pil_face, attrs_list, thresholds):
+def predict_celeba(model, pil_face, attrs_list, thresholds, max_extra=None):
     face_tensor = celeba_transform(pil_face).unsqueeze(0).to(DEVICE)
     with torch.no_grad():
         logits = model(face_tensor)
         probs = torch.sigmoid(logits).cpu().squeeze()
-    pred_attrs = []
+
+    # collect all attribute confidences above their threshold
+    attr_confidences = []
     for attr_name, p in zip(attrs_list, probs):
         thresh = thresholds.get(attr_name, 0.8)
         if p.item() > thresh:
             pretty = attr_name.replace("_", " ")
-            pred_attrs.append(pretty)
-    # Male/Female logic
-    if any(a.lower() == "male" for a in pred_attrs):
-        pred_attrs = [a for a in pred_attrs if a.lower() != "male"]
-        pred_attrs.insert(0, "Male")
+            attr_confidences.append((pretty, p.item()))
+
+    # sort by confidence desc
+    attr_confidences.sort(key=lambda x: x[1], reverse=True)
+
+    # gender logic
+    if any(a.lower() == "male" for a, _ in attr_confidences):
+        gender = "Male"
     else:
-        pred_attrs.insert(0, "Female")
-    # dedupe and preserve order
-    return unique_preserve(pred_attrs)
+        gender = "Female"
+
+    final = [gender]
+
+    # add non-gender attrs, capped if max_extra is not None
+    extras = []
+    for pretty, _ in attr_confidences:
+        low = pretty.lower()
+        if low in ("male", "female"):
+            continue
+        extras.append(pretty)
+        if max_extra is not None and len(extras) >= max_extra:
+            break
+
+    final.extend(extras)
+    return unique_preserve(final)
 
 def predict_fairface(model, pil_face, race_labels, gender_labels, age_labels, thresholds):
     face_tensor = fairface_transform(pil_face).unsqueeze(0).to(DEVICE)
