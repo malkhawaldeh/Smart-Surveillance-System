@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import cv2
 import torch
 import torch.nn as nn
@@ -8,6 +9,14 @@ from PIL import Image
 from torchvision import transforms
 from torchvision.models import resnet50, resnet34, ResNet50_Weights, ResNet34_Weights
 import torch.nn.functional as F
+
+# === for simplify_result ===
+FAIRFACE_GENDER_LABELS = ['Female', 'Male']
+FAIRFACE_RACE_LABELS = ['Black', 'East Asian', 'Indian', 'Latino_Hispanic', 'Middle Eastern', 'Southeast Asian', 'White']
+UPAR_LABEL_COLS = [
+    'Accessory-Backpack', 'Accessory-Bag', 'Accessory-Glasses-Normal', 'Accessory-Hat',
+    'Age-Adult', 'Age-Young', 'Gender-Female', 'Hair-Length-Long', 'Hair-Length-Short'
+]
 
 # ================= CONFIGURATION & PATHS =================
 
@@ -362,14 +371,16 @@ def predict_celeba(model, pil_face, attrs_list, thresholds):
     for attr_name, p in zip(attrs_list, probs):
         thresh = thresholds.get(attr_name, 0.8)
         if p.item() > thresh:
-            pred_attrs.append(attr_name.replace("_", " "))
+            pretty = attr_name.replace("_", " ")
+            pred_attrs.append(pretty)
+    # Male/Female logic
     if any(a.lower() == "male" for a in pred_attrs):
         pred_attrs = [a for a in pred_attrs if a.lower() != "male"]
         pred_attrs.insert(0, "Male")
     else:
         pred_attrs.insert(0, "Female")
-    return pred_attrs
-
+    # dedupe and preserve order
+    return unique_preserve(pred_attrs)
 
 def predict_fairface(model, pil_face, race_labels, gender_labels, age_labels, thresholds):
     face_tensor = fairface_transform(pil_face).unsqueeze(0).to(DEVICE)
@@ -398,9 +409,11 @@ def predict_fashionpedia(model, person_crop, ordered_ids, id_to_name, threshold)
     for idx, attr_id in enumerate(ordered_ids):
         if probs[idx].item() > threshold:
             name = id_to_name.get(attr_id, str(attr_id))
+            # filter out fallback attr_* if no real mapping
+            if is_fallback_attr(name):
+                continue
             preds.append(name)
-    return preds
-
+    return unique_preserve(preds)
 
 def predict_upar(model, person_crop, active_cols, label_idx_map, thresholds):
     image_pil = Image.fromarray(cv2.cvtColor(person_crop, cv2.COLOR_BGR2RGB))
@@ -413,8 +426,120 @@ def predict_upar(model, person_crop, active_cols, label_idx_map, thresholds):
         idx = label_idx_map[label]
         if probs[idx].item() > thresholds.get(label, 0.85):
             preds.append(label)
-    return preds
+    return unique_preserve(preds)
 
+
+def sanitize_for_json(obj):
+    if isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [sanitize_for_json(v) for v in obj]
+    if isinstance(obj, np.generic):
+        return obj.item()
+    if isinstance(obj, torch.Tensor):
+        return sanitize_for_json(obj.detach().cpu().tolist())
+    return obj
+
+def simplify_result(raw):
+    out = {
+        "thresholds": {
+            "face_detection_conf": raw["thresholds"].get("face_detection_conf"),
+            "person_detection_conf": raw["thresholds"].get("person_detection_conf")
+        },
+        "faces": [],
+        "people": []
+    }
+
+    for f in raw.get("faces", []):
+        face = {"box": f.get("box", [])}
+        celeba_attrs = []
+        fairface_struct = {}
+        combined_attrs = []
+
+        for a in f.get("attributes", []):
+            low = a.lower()
+            if a.startswith("Age:"):
+                fairface_struct["age"] = a.replace("Age: ", "")
+                combined_attrs.append(a)
+            elif a in FAIRFACE_GENDER_LABELS:
+                fairface_struct["gender"] = a
+                combined_attrs.append(a)
+            elif a in FAIRFACE_RACE_LABELS:
+                fairface_struct["race"] = a
+                combined_attrs.append(a)
+            else:
+                # skip CelebA gender/female label if duplicated
+                if low in ("male", "female"):
+                    continue
+                celeba_attrs.append(a)
+                combined_attrs.append(a)
+
+        if celeba_attrs:
+            face["celeba"] = celeba_attrs
+        if fairface_struct:
+            face["fairface"] = fairface_struct
+        if combined_attrs:
+            face["attributes"] = combined_attrs  # backward compatibility
+        out["faces"].append(face)
+
+    for p in raw.get("people", []):
+        person = {"box": p.get("box", [])}
+        fashion = []
+        upar = []
+        if "fashion_upar" in p:
+            for label in p["fashion_upar"]:
+                if label in UPAR_LABEL_COLS or any(label.startswith(pref) for pref in ["Accessory", "Age", "Gender", "Hair"]):
+                    upar.append(label)
+                else:
+                    fashion.append(label)
+        if fashion:
+            person["fashionpedia"] = fashion
+        if upar:
+            person["upar"] = upar
+        # backward compatibility concat
+        combined = []
+        if fashion:
+            combined.extend(fashion)
+        if upar:
+            combined.extend(upar)
+        if combined:
+            person["fashion_upar"] = combined
+        out["people"].append(person)
+
+    return out
+
+def unique_preserve(seq):
+    seen = set()
+    out = []
+    for item in seq:
+        if item not in seen:
+            seen.add(item)
+            out.append(item)
+    return out
+
+def is_fallback_attr(name):
+    # filters out attr_1, attr_5, etc. when no proper mapping exists
+    return bool(re.fullmatch(r"attr_\d+", name))
+
+def sanitize_result(obj):
+    if isinstance(obj, dict):
+        return {sanitize_result(k): sanitize_result(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [sanitize_result(x) for x in obj]
+    if isinstance(obj, tuple):
+        return tuple(sanitize_result(x) for x in obj)
+    if isinstance(obj, np.generic):
+        return obj.item()
+    if isinstance(obj, np.ndarray):
+        return sanitize_result(obj.tolist())
+    try:
+        import torch
+        if torch.is_tensor(obj):
+            return sanitize_result(obj.cpu().detach().numpy())
+    except ImportError:
+        pass
+    # primitives (int, float, str, bool) pass through
+    return obj
 
 # ================== FULL PIPELINE CLASS =====================
 class ModelPipeline:
@@ -512,6 +637,7 @@ class ModelPipeline:
                                                  self.fashionpedia_ordered_ids,
                                                  self.fashionpedia_id2name,
                                                  self.fashionpedia_threshold))
+            preds = unique_preserve(preds)
             if preds:
                 person_entry["fashion_upar"] = preds
             output["people"].append(person_entry)
@@ -532,8 +658,6 @@ class ModelPipeline:
             sy1 = max(0, cy - side // 2)
             sx2 = min(w, cx + side // 2)
             sy2 = min(h, cy + side // 2)
-            if sy2 <= sy1 or sx2 <= sx1:
-                continue  # invalid crop
             pil_face = Image.fromarray(cv2.cvtColor(cv_img[sy1:sy2, sx1:sx2], cv2.COLOR_BGR2RGB))
             face_entry = {"box": box}
             face_preds = []
@@ -547,12 +671,13 @@ class ModelPipeline:
                 face_preds.extend(predict_celeba(self.celeba_model, pil_face,
                                                  self.celeba_attrs_list,
                                                  self.celeba_thresholds))
+            face_preds = unique_preserve(face_preds)
             if face_preds:
                 face_entry["attributes"] = face_preds
             output["faces"].append(face_entry)
 
-        return output
+        # sanitize before returning
+        return sanitize_result(output)
 
-
-# Singleton instance
+# Singleton
 pipeline = ModelPipeline()

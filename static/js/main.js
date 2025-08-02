@@ -200,8 +200,7 @@ function formatResult(result) {
 
       const meta = document.createElement('div');
       meta.style.flex = '1 1 200px';
-      meta.innerHTML = `<div><strong>Face #${idx + 1}</strong></div>
-        <div>Box: [${f.box.join(', ')}]</div>`;
+      meta.innerHTML = `<div><strong>Face #${idx + 1}</strong></div>`;
       card.appendChild(meta);
 
       if (f.attributes && f.attributes.length) {
@@ -241,14 +240,13 @@ function formatResult(result) {
 
       const meta = document.createElement('div');
       meta.style.flex = '1 1 150px';
-      meta.innerHTML = `<div><strong>Person #${idx + 1}</strong></div>
-        <div>Box: [${p.box.join(', ')}]</div>`;
+      meta.innerHTML = `<div><strong>Person #${idx + 1}</strong></div>`;
       card.appendChild(meta);
 
       if (p.fashion_upar && p.fashion_upar.length) {
         const fuDiv = document.createElement('div');
         fuDiv.style.flex = '1 1 250px';
-        fuDiv.innerHTML = `<div><strong>Fashion / UPAR</strong></div>`;
+        fuDiv.innerHTML = `<div><strong>Attributes</strong></div>`;
         const list = document.createElement('ul');
         list.style.margin = '4px 0';
         list.style.paddingLeft = '16px';
