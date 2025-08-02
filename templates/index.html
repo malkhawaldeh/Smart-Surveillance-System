@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Surveillance System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="title-block">
+        <h1 class=>Smart Surveillance System</h1>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- INPUT PANEL -->
+    <div class="panel" id="inputPanel">
+      <div class="panel-title">Input Surveillance</div>
+      <div class="panel-content" id="uploadContent">
+      </div>
+      <div class="panel-buttons">
+        <div class="group">
+          <button id="fileButton" class="primary">Upload Image</button>
+          <input type="file" id="fileInput" accept="image/*,video/*" hidden>
+          <button id="webcamCaptureButton" class="secondary">Webcam / Capture</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel" id="outputPanel">
+      <div class="panel-title">Output Insights</div>
+      <div class="panel-content" id="outputContent">
+        <!-- Prediction / model output will go here eventually -->
+      </div>
+      <div class="panel-buttons">
+        <div class="group">
+          <button id="predictButton" class="accent">Predict</button>
+          <button id="clearButton" class="tertiary">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
